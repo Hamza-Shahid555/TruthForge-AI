@@ -1,0 +1,15 @@
+langgraph
+langchain
+langchain-openai
+langchain-community
+langchain-mcp-adapters
+mcp
+ddgs
+faiss-cpu
+fastapi
+uvicorn
+langgraph-checkpoint-sqlite
+langgraph-checkpoint-postgres
+psycopg[binary]
+langsmith
+python-dotenv

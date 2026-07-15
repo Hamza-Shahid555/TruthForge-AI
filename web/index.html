@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TruthForge AI — The Proof House, Live</title>
+<style>
+  :root {
+    --ground: #ECE9E3;
+    --panel: #F6F4EF;
+    --panel-2: #E2DED5;
+    --line: #D2CBBE;
+    --line-strong: #B7AE9E;
+    --text: #241E15;
+    --dim: #6F6557;
+    --ember: #B4531B;
+    --steel: #2F6A86;
+    --brass: #8A6A20;
+    --spark: 180, 84, 27;
+    --focus: #B4531B;
+    --plate-shadow: 0 1px 0 rgba(36, 30, 21, 0.08);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #151210;
+      --panel: #1E1915;
+      --panel-2: #282017;
+      --line: #3B322A;
+      --line-strong: #55483B;
+      --text: #EFE5D3;
+      --dim: #A08F7B;
+      --ember: #FF8B47;
+      --steel: #8FC1D9;
+      --brass: #D8A94E;
+      --spark: 255, 139, 71;
+      --focus: #FF8B47;
+      --plate-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; }
+
+  .fh-root {
+    background: var(--ground);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .fh-display {
+    font-family: "Bahnschrift", "Avenir Next Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    font-stretch: condensed;
+    text-transform: uppercase;
+  }
+  .fh-serif { font-family: "Charter", "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif; }
+  .fh-mono { font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace; }
+
+  .fh-wrap { max-width: 860px; margin: 0 auto; padding: 0 22px; }
+  .fh-heatbar { width: 66px; height: 4px; background: linear-gradient(90deg, var(--ember), var(--steel)); margin: 0 0 14px; }
+  .fh-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--dim); margin: 0 0 8px; }
+  .fh-h2 { font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 700; letter-spacing: 0.03em; margin: 0 0 8px; text-wrap: balance; }
+  .fh-section { padding: 44px 0; }
+  .fh-section + .fh-section { padding-top: 8px; }
+
+  /* hero */
+  .fh-hero { position: relative; overflow: hidden; padding: 56px 0 48px; border-bottom: 1px solid var(--line); }
+  .fh-hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .fh-hero-inner { position: relative; }
+
+  .fh-kicker {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 24px;
+  }
+  .fh-kicker::before { content: ""; width: 34px; height: 1px; background: var(--line-strong); }
+
+  .fh-status { font-size: 10.5px; letter-spacing: 0.1em; padding: 3px 9px; border-radius: 2px; margin-left: auto; }
+  .fh-status.live { color: var(--ember); border: 1px solid var(--ember); }
+  .fh-status.idle { color: var(--dim); border: 1px solid var(--line-strong); }
+
+  .fh-title { font-size: clamp(2.4rem, 9vw, 4.6rem); font-weight: 700; line-height: 0.98; letter-spacing: 0.015em; margin: 0 0 6px; }
+  .fh-title .hot { color: var(--ember); text-shadow: 0 0 26px rgba(var(--spark), 0.35); }
+  .fh-live-tag {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: 0.32em; vertical-align: super; color: var(--steel); letter-spacing: 0.08em;
+  }
+
+  .fh-tagline { font-size: clamp(1rem, 2.4vw, 1.2rem); font-style: italic; max-width: 50ch; margin: 12px 0 0; text-wrap: balance; }
+  .fh-tagline em { font-style: italic; color: var(--ember); }
+  .fh-lede { font-size: 0.96rem; color: var(--dim); max-width: 66ch; margin: 14px 0 0; }
+
+  .fh-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 32px; }
+  .fh-role {
+    background: var(--panel); border: 1px solid var(--line); padding: 12px 14px;
+    box-shadow: var(--plate-shadow); clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+  }
+  .fh-role-name {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 4px; display: flex; align-items: center; gap: 7px;
+  }
+  .fh-role-name::before { content: ""; width: 8px; height: 8px; background: currentColor; flex: none; }
+  .fh-role.pro .fh-role-name { color: var(--ember); }
+  .fh-role.skep .fh-role-name { color: var(--steel); }
+  .fh-role.judge .fh-role-name { color: var(--brass); }
+  .fh-role.human .fh-role-name { color: var(--text); }
+  .fh-role-desc { font-size: 12px; color: var(--dim); }
+
+  /* file-case form */
+  .fh-file-form { display: flex; gap: 10px; flex-wrap: wrap; margin: 22px 0 8px; }
+  .fh-input {
+    flex: 1 1 320px; font: inherit; font-size: 15px; padding: 12px 14px;
+    background: var(--panel); border: 1px solid var(--line); color: var(--text);
+  }
+  .fh-input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .fh-file-btn {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 12px 20px; background: var(--panel-2); border: 1px solid var(--line-strong); color: var(--text);
+    cursor: pointer;
+  }
+  .fh-file-btn:hover:not(:disabled) { border-color: var(--ember); color: var(--ember); }
+  .fh-file-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .fh-file-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .fh-hint { font-size: 12px; color: var(--dim); margin: 8px 0 28px; }
+
+  .fh-phase { font-size: 12.5px; color: var(--dim); margin: 4px 0 28px; display: none; align-items: center; gap: 8px; }
+  .fh-phase.shown { display: flex; }
+  .fh-phase .dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ember);
+    animation: fh-pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes fh-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  /* transcript */
+  .fh-test-head {
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+    padding-bottom: 16px; margin-bottom: 30px; border-bottom: 1px solid var(--line);
+  }
+  .fh-claim { font-size: clamp(1.15rem, 3.2vw, 1.5rem); font-style: italic; max-width: 46ch; margin: 0; text-wrap: balance; }
+  .fh-gauge { display: flex; align-items: center; gap: 7px; font-size: 10.5px; letter-spacing: 0.1em; color: var(--dim); text-transform: uppercase; flex: none; }
+  .fh-gauge-cell { width: 16px; height: 16px; border: 1px solid var(--line-strong); background: var(--panel); flex: none; }
+  .fh-gauge-cell.pro { background: var(--ember); border-color: var(--ember); }
+  .fh-gauge-cell.skep { background: var(--steel); border-color: var(--steel); }
+  .fh-gauge-cell.tie { background: linear-gradient(135deg, var(--ember) 0 50%, var(--steel) 50% 100%); border-color: var(--line-strong); }
+
+  .fh-round { margin-bottom: 40px; opacity: 0; transform: translateY(10px); animation: fh-rise 0.4s ease forwards; }
+  @keyframes fh-rise { to { opacity: 1; transform: translateY(0); } }
+  .fh-round-label {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim);
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .fh-round-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .fh-strike { display: flex; margin-bottom: 14px; }
+  .fh-strike.pro { justify-content: flex-start; }
+  .fh-strike.skep { justify-content: flex-end; }
+  .fh-plate { width: min(620px, 100%); background: var(--panel); border: 1px solid var(--line); padding: 16px 18px; box-shadow: var(--plate-shadow); }
+  @media (min-width: 760px) { .fh-plate { width: 82%; } }
+  .fh-strike.pro .fh-plate { border-right: 4px solid var(--ember); clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px); }
+  .fh-strike.skep .fh-plate { border-left: 4px solid var(--steel); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+
+  .fh-who { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 7px; margin-bottom: 9px; }
+  .fh-who::before { content: ""; width: 8px; height: 8px; background: currentColor; flex: none; }
+  .fh-strike.pro .fh-who { color: var(--ember); }
+  .fh-strike.skep .fh-who { color: var(--steel); }
+  .fh-arg { font-size: 15px; line-height: 1.6; margin: 0 0 12px; }
+  .fh-cites { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .fh-cites-label { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+  .fh-cite { font-size: 10.5px; color: var(--dim); border: 1px solid var(--line); padding: 2px 8px; background: var(--ground); }
+
+  .fh-tag { width: min(660px, 100%); margin: 22px auto 0; background: var(--panel-2); border: 1px solid var(--line-strong); padding: 18px 20px 16px; position: relative; }
+  .fh-tag::before { content: ""; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 11px; height: 11px; border-radius: 50%; background: var(--ground); border: 2px solid var(--brass); }
+  .fh-tag-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; margin-bottom: 8px; }
+  .fh-tag-label { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--brass); }
+  .fh-tag-json { font-size: 11px; color: var(--dim); word-break: break-word; }
+  .fh-tag-json .k { color: var(--brass); }
+  .fh-tag-reason { font-size: 14.5px; line-height: 1.6; margin: 0; }
+
+  .fh-stamp-row { text-align: center; margin-top: 34px; }
+  .fh-stamp { display: inline-block; border: 3px double var(--ember); color: var(--ember); padding: 12px 24px; font-weight: 700; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-2deg); }
+  .fh-stamp.human-stamp { border-color: var(--brass); color: var(--brass); }
+  .fh-stamp-note { display: block; margin-top: 12px; font-size: 11px; letter-spacing: 0.08em; color: var(--dim); }
+
+  .fh-hitl { margin-top: 34px; border: 1px dashed var(--brass); background: var(--panel); padding: 20px 22px; }
+  .fh-hitl-head { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; color: var(--brass); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .fh-hitl-head::before { content: "\23F8"; font-size: 13px; }
+  .fh-hitl-body { font-size: 14px; margin: 0 0 16px; max-width: 68ch; }
+  .fh-hitl-body code { font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace; font-size: 12px; background: var(--panel-2); border: 1px solid var(--line); padding: 1px 5px; }
+  .fh-hitl-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+  .fh-rule-btn {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace; font-size: 12px; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 10px 16px; background: var(--ground); border: 1px solid var(--line-strong);
+    color: var(--text); cursor: pointer;
+  }
+  .fh-rule-btn:hover:not(:disabled) { border-color: var(--brass); color: var(--brass); }
+  .fh-rule-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .fh-rule-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .fh-rule-result { display: none; margin-top: 16px; font-size: 12px; color: var(--dim); word-break: break-word; }
+  .fh-rule-result.shown { display: block; }
+  .fh-rule-result .ok { color: var(--brass); }
+
+  .fh-error { margin-top: 20px; padding: 14px 16px; border: 1px solid var(--ember); color: var(--ember); font-size: 13.5px; background: var(--panel); }
+
+  /* bill of materials */
+  .fh-bom { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+  .fh-bom-group { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--line-strong); padding: 14px 16px; }
+  .fh-bom-group:nth-child(1) { border-top-color: var(--ember); }
+  .fh-bom-group:nth-child(2) { border-top-color: var(--steel); }
+  .fh-bom-group:nth-child(3) { border-top-color: var(--brass); }
+  .fh-bom-group:nth-child(4) { border-top-color: var(--line-strong); }
+  .fh-bom-title { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; }
+  .fh-bom-items { display: flex; flex-wrap: wrap; gap: 7px; }
+  .fh-chip { font-size: 11.5px; padding: 4px 10px; border: 1px solid var(--line); background: var(--ground); color: var(--text); white-space: nowrap; }
+
+  .fh-footer { border-top: 1px solid var(--line); padding: 26px 0 56px; font-size: 12.5px; color: var(--dim); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fh-round { animation: none; opacity: 1; transform: none; }
+    .fh-phase .dot { animation: none; }
+    .fh-root * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="fh-root">
+
+  <header class="fh-hero">
+    <canvas id="fh-sparks" aria-hidden="true"></canvas>
+    <div class="fh-wrap fh-hero-inner">
+      <p class="fh-kicker fh-mono">The proof house &middot; a multi-agent debate system &middot; LangGraph
+        <span class="fh-status idle" id="status-badge">idle</span>
+      </p>
+      <h1 class="fh-title fh-display">Truth<span class="hot">Forge</span> <span class="fh-live-tag">/ live</span></h1>
+      <p class="fh-tagline fh-serif">File a claim below and watch it get <em>proof-tested</em> for real &mdash; struck from opposite sides until the Judge can certify what holds.</p>
+      <p class="fh-lede">Two LLM agents research your claim in parallel &mdash; one arguing for it, one against &mdash; drawing on a local evidence corpus and live web search. A judge scores every round with a structured ruling. When the judge genuinely cannot decide, the graph pauses and waits for you.</p>
+
+      <div class="fh-roles">
+        <div class="fh-role pro">
+          <div class="fh-role-name fh-mono">Proponent</div>
+          <div class="fh-role-desc">Strikes for the claim, researches independently.</div>
+        </div>
+        <div class="fh-role skep">
+          <div class="fh-role-name fh-mono">Skeptic</div>
+          <div class="fh-role-desc">Strikes against it, same tools, opposite brief.</div>
+        </div>
+        <div class="fh-role judge">
+          <div class="fh-role-name fh-mono">Judge</div>
+          <div class="fh-role-desc">Scores each round, certifies or reconvenes.</div>
+        </div>
+        <div class="fh-role human">
+          <div class="fh-role-name fh-mono">You</div>
+          <div class="fh-role-desc">Summoned only on deadlock, to break the tie.</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="fh-section">
+    <div class="fh-wrap">
+      <div class="fh-heatbar" aria-hidden="true"></div>
+      <p class="fh-eyebrow fh-mono">File a claim</p>
+      <h2 class="fh-h2 fh-display">Put it to the test</h2>
+
+      <form class="fh-file-form" id="file-case-form">
+        <input type="text" class="fh-input" id="claim-input" placeholder="e.g. Remote work makes teams more productive" required />
+        <button type="submit" class="fh-file-btn" id="file-btn">Strike the claim</button>
+      </form>
+      <p class="fh-hint fh-mono">Runs against your local API at 127.0.0.1:8000 &mdash; each case takes roughly 15&ndash;30 seconds.</p>
+
+      <div class="fh-phase fh-mono" id="phase-line"><span class="dot"></span><span id="phase-text">Working&hellip;</span></div>
+
+      <div id="transcript"></div>
+    </div>
+  </section>
+
+  <section class="fh-section">
+    <div class="fh-wrap">
+      <div class="fh-heatbar" aria-hidden="true"></div>
+      <p class="fh-eyebrow fh-mono">Bill of materials</p>
+      <h2 class="fh-h2 fh-display">Built across sixteen stages</h2>
+      <div class="fh-bom">
+        <div class="fh-bom-group">
+          <div class="fh-bom-title fh-mono">Orchestration</div>
+          <div class="fh-bom-items fh-mono">
+            <span class="fh-chip">LangGraph</span>
+            <span class="fh-chip">LangChain</span>
+          </div>
+        </div>
+        <div class="fh-bom-group">
+          <div class="fh-bom-title fh-mono">Evidence</div>
+          <div class="fh-bom-items fh-mono">
+            <span class="fh-chip">RAG &middot; FAISS</span>
+            <span class="fh-chip">MCP tool server</span>
+          </div>
+        </div>
+        <div class="fh-bom-group">
+          <div class="fh-bom-title fh-mono">Verdicts &amp; state</div>
+          <div class="fh-bom-items fh-mono">
+            <span class="fh-chip">Structured output</span>
+            <span class="fh-chip">SQLite &rarr; PostgreSQL</span>
+            <span class="fh-chip">Streaming</span>
+            <span class="fh-chip">Human-in-the-loop</span>
+          </div>
+        </div>
+        <div class="fh-bom-group">
+          <div class="fh-bom-title fh-mono">Serving &amp; eval</div>
+          <div class="fh-bom-items fh-mono">
+            <span class="fh-chip">LangSmith tracing + eval</span>
+            <span class="fh-chip">FastAPI</span>
+            <span class="fh-chip">Docker + Postgres</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="fh-wrap">
+    <footer class="fh-footer">
+      <span>Every run on this page is real &mdash; live OpenAI calls against your own API, not a scripted demo.</span>
+      <span class="fh-mono">TruthForge AI &middot; built while learning LangGraph</span>
+    </footer>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var form = document.getElementById("file-case-form");
+  var input = document.getElementById("claim-input");
+  var fileBtn = document.getElementById("file-btn");
+  var statusBadge = document.getElementById("status-badge");
+  var phaseLine = document.getElementById("phase-line");
+  var phaseText = document.getElementById("phase-text");
+  var transcriptEl = document.getElementById("transcript");
+
+  var roundBuffer = null;
+  var roundIndex = 0;
+  var currentThreadId = null;
+  var proponentWins = 0;
+  var skepticWins = 0;
+  var gaugeCellsEl = null;
+  var gaugeTallyEl = null;
+
+  function escapeHtml(s) {
+    var d = document.createElement("div");
+    d.textContent = s == null ? "" : String(s);
+    return d.innerHTML;
+  }
+
+  function setStatus(live) {
+    statusBadge.textContent = live ? "live" : "idle";
+    statusBadge.className = "fh-status " + (live ? "live" : "idle");
+  }
+
+  function setPhase(text) {
+    if (!text) { phaseLine.classList.remove("shown"); return; }
+    phaseText.textContent = text;
+    phaseLine.classList.add("shown");
+  }
+
+  function citesHtml(cites) {
+    var chips = (cites || []).map(function (c) {
+      return '<span class="fh-cite fh-mono">' + escapeHtml(c) + "</span>";
+    }).join("");
+    return '<div class="fh-cites"><span class="fh-cites-label fh-mono">cited</span>' + chips + "</div>";
+  }
+
+  function strikeHtml(side, who, text, cites) {
+    return (
+      '<div class="fh-strike ' + side + '">' +
+        '<div class="fh-plate">' +
+          '<div class="fh-who fh-mono">' + who + "</div>" +
+          '<p class="fh-arg fh-serif">' + escapeHtml(text) + "</p>" +
+          citesHtml(cites) +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function tagHtml(v) {
+    var json =
+      '<span class="fh-tag-json fh-mono">{ <span class="k">"winner"</span>: "' + escapeHtml(v.winner) +
+      '", <span class="k">"concluded"</span>: ' + v.concluded + " }</span>";
+    return (
+      '<div class="fh-tag">' +
+        '<div class="fh-tag-head">' +
+          '<span class="fh-tag-label fh-mono">Judge&rsquo;s inspection</span>' + json +
+        "</div>" +
+        '<p class="fh-tag-reason fh-serif">' + escapeHtml(v.reasoning) + "</p>" +
+      "</div>"
+    );
+  }
+
+  function startTranscript(claim, threadId) {
+    transcriptEl.innerHTML =
+      '<div class="fh-test-head">' +
+        '<div><p class="fh-eyebrow fh-mono" style="margin-bottom:4px;">docket ' + threadId.slice(0, 8) + " &middot; claim under test</p>" +
+        '<p class="fh-claim fh-serif">&ldquo;' + escapeHtml(claim) + '&rdquo;</p></div>' +
+        '<div class="fh-gauge fh-mono" id="fh-gauge"><span id="fh-gauge-cells"></span><span id="fh-gauge-tally">P 0 &ndash; 0 S</span></div>' +
+      "</div>";
+    gaugeCellsEl = document.getElementById("fh-gauge-cells");
+    gaugeTallyEl = document.getElementById("fh-gauge-tally");
+  }
+
+  function addGaugeCell(winner) {
+    var cls = winner === "proponent" ? "pro" : winner === "skeptic" ? "skep" : "tie";
+    var span = document.createElement("span");
+    span.className = "fh-gauge-cell " + cls;
+    gaugeCellsEl.appendChild(span);
+    gaugeTallyEl.textContent = "P " + proponentWins + " – " + skepticWins + " S";
+  }
+
+  function startRound(n) {
+    roundIndex = n;
+    roundBuffer = { proponent: null, skeptic: null };
+    var el = document.createElement("div");
+    el.className = "fh-round";
+    el.id = "fh-round-" + n;
+    el.style.animationDelay = reducedMotion ? "0ms" : "0ms";
+    el.innerHTML = '<div class="fh-round-label fh-mono">Round ' + n + "</div>";
+    transcriptEl.appendChild(el);
+  }
+
+  function flushRoundArgs() {
+    var roundEl = document.getElementById("fh-round-" + roundIndex);
+    if (!roundEl || !roundBuffer.proponent || !roundBuffer.skeptic) return;
+    if (roundEl.querySelector(".fh-strike")) return;
+    roundEl.insertAdjacentHTML(
+      "beforeend",
+      strikeHtml("pro", "Proponent", roundBuffer.proponent.text, roundBuffer.proponent.cites) +
+      strikeHtml("skep", "Skeptic", roundBuffer.skeptic.text, roundBuffer.skeptic.cites)
+    );
+  }
+
+  function renderVerdict(verdict) {
+    var roundEl = document.getElementById("fh-round-" + roundIndex);
+    if (!roundEl) return;
+    roundEl.insertAdjacentHTML("beforeend", tagHtml(verdict));
+    if (verdict.winner === "proponent") proponentWins++;
+    if (verdict.winner === "skeptic") skepticWins++;
+    addGaugeCell(verdict.winner);
+  }
+
+  function renderStamp(finalVerdict) {
+    var el = document.createElement("div");
+    el.className = "fh-stamp-row";
+    el.innerHTML =
+      '<span class="fh-stamp fh-display">' + escapeHtml(finalVerdict) + "</span>" +
+      '<span class="fh-stamp-note fh-mono">Case closed by the Judge.</span>';
+    transcriptEl.appendChild(el);
+  }
+
+  function renderHitl(payload, threadId) {
+    var el = document.createElement("div");
+    el.className = "fh-hitl";
+    el.innerHTML =
+      '<div class="fh-hitl-head fh-mono">The forge is paused &mdash; human ruling required</div>' +
+      '<p class="fh-hitl-body">' + escapeHtml(payload.reason) + " " + escapeHtml(payload.question) +
+      " The buttons below trigger the exact <code>interrupt()</code> / <code>Command(resume=&hellip;)</code> " +
+      "pause built into the real graph.</p>" +
+      '<div class="fh-hitl-buttons">' +
+      '<button type="button" class="fh-rule-btn" data-r="proponent">Rule for Proponent</button>' +
+      '<button type="button" class="fh-rule-btn" data-r="skeptic">Rule for Skeptic</button>' +
+      '<button type="button" class="fh-rule-btn" data-r="tie">Uphold as a tie</button>' +
+      "</div>" +
+      '<div class="fh-rule-result fh-mono" id="fh-rule-result" aria-live="polite"></div>';
+    transcriptEl.appendChild(el);
+
+    var buttons = el.querySelectorAll(".fh-rule-btn");
+    var resultEl = document.getElementById("fh-rule-result");
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        buttons.forEach(function (x) { x.disabled = true; });
+        setPhase("Resuming with your ruling…");
+        streamFrom(
+          "/debates/" + threadId + "/resume",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ winner: b.getAttribute("data-r"), note: "Ruled via the live UI." }),
+          },
+          handleEvent,
+          onStreamDone
+        ).catch(showError);
+        resultEl.innerHTML = '<span class="ok">&#10003;</span> Command(resume={"winner": "' +
+          b.getAttribute("data-r") + '"}) sent — resuming from checkpoint.';
+        resultEl.classList.add("shown");
+      });
+    });
+  }
+
+  function showError(err) {
+    setPhase(null);
+    setStatus(false);
+    fileBtn.disabled = false;
+    var box = document.createElement("div");
+    box.className = "fh-error";
+    box.textContent = "Something went wrong talking to the API: " + err.message +
+      " — make sure `uvicorn api.main:app --reload` is running.";
+    transcriptEl.appendChild(box);
+  }
+
+  function handleEvent(evt) {
+    var node = evt.node;
+    var output = evt.output;
+
+    if (node === "round_manager") {
+      setPhase("Round " + output.round + " — researching…");
+      startRound(output.round);
+    } else if (node === "proponent") {
+      roundBuffer.proponent = { text: output.proponent_args[output.proponent_args.length - 1], cites: output.citations };
+      flushRoundArgs();
+    } else if (node === "skeptic") {
+      roundBuffer.skeptic = { text: output.skeptic_args[output.skeptic_args.length - 1], cites: output.citations };
+      flushRoundArgs();
+    } else if (node === "judge") {
+      setPhase("Judge inspecting round " + roundIndex + "…");
+      renderVerdict(output.verdicts[output.verdicts.length - 1]);
+    } else if (node === "finalize") {
+      renderStamp(output.final_verdict);
+    } else if (node === "__interrupt__") {
+      setPhase(null);
+      renderHitl(output, currentThreadId);
+    }
+  }
+
+  function onStreamDone() {
+    setPhase(null);
+    setStatus(false);
+    fileBtn.disabled = false;
+  }
+
+  function streamFrom(url, options, onEvent, onDone) {
+    return fetch(url, options).then(function (resp) {
+      if (!resp.ok || !resp.body) throw new Error("Request failed: " + resp.status);
+      var reader = resp.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = "";
+      function pump() {
+        return reader.read().then(function (chunk) {
+          if (chunk.done) { onDone && onDone(); return; }
+          buffer += decoder.decode(chunk.value, { stream: true });
+          var parts = buffer.split("\n\n");
+          buffer = parts.pop();
+          for (var i = 0; i < parts.length; i++) {
+            var part = parts[i];
+            if (part.indexOf("data: ") === 0) {
+              try { onEvent(JSON.parse(part.slice(6))); } catch (e) { /* ignore */ }
+            }
+          }
+          return pump();
+        });
+      }
+      return pump();
+    });
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var claim = input.value.trim();
+    if (!claim) return;
+
+    fileBtn.disabled = true;
+    setStatus(true);
+    roundIndex = 0;
+    proponentWins = 0;
+    skepticWins = 0;
+    setPhase("Filing the case…");
+
+    fetch("/debates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ claim: claim, max_rounds: 2 }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        currentThreadId = data.thread_id;
+        startTranscript(claim, currentThreadId);
+        setPhase("Round 1 — researching…");
+        return streamFrom("/debates/" + currentThreadId + "/stream", { method: "GET" }, handleEvent, onStreamDone);
+      })
+      .catch(showError);
+  });
+
+  /* ambient ember sparks */
+  var canvas = document.getElementById("fh-sparks");
+  function sparkRGB() {
+    var v = getComputedStyle(document.documentElement).getPropertyValue("--spark").trim();
+    return v || "255,139,71";
+  }
+  if (canvas && canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+    var hero = canvas.parentElement;
+    if (!reducedMotion) {
+      var W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var parts = [];
+      function resize() {
+        W = hero.clientWidth; H = hero.clientHeight;
+        canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      function spawn() {
+        return { x: Math.random() * W, y: H + 6, vx: (Math.random() - 0.5) * 0.35, vy: -(0.35 + Math.random() * 0.9), r: 0.8 + Math.random() * 1.6, life: 0, max: 240 + Math.random() * 220, rgb: sparkRGB() };
+      }
+      function tick() {
+        ctx.clearRect(0, 0, W, H);
+        var target = Math.min(40, Math.max(12, Math.floor(W / 26)));
+        while (parts.length < target) parts.push(spawn());
+        for (var i = parts.length - 1; i >= 0; i--) {
+          var p = parts[i];
+          p.life++;
+          p.x += p.vx + Math.sin((p.life + p.max) * 0.02) * 0.18;
+          p.y += p.vy;
+          var a = Math.max(0, 0.42 * (1 - p.life / p.max));
+          if (p.life >= p.max || p.y < -8) { parts[i] = spawn(); continue; }
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(" + p.rgb + "," + a.toFixed(3) + ")"; ctx.fill();
+        }
+        requestAnimationFrame(tick);
+      }
+      resize();
+      window.addEventListener("resize", resize);
+      requestAnimationFrame(tick);
+    } else {
+      var w = hero.clientWidth, h = hero.clientHeight;
+      canvas.width = w; canvas.height = h;
+      var rgb = sparkRGB();
+      for (var i = 0; i < 22; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.random() * w, Math.random() * h, 0.8 + Math.random() * 1.4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(" + rgb + ",0.16)"; ctx.fill();
+      }
+    }
+  }
+})();
+</script>
+</body>
+</html>

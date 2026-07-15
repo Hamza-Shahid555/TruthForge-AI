@@ -1,0 +1,10 @@
+.venv/
+my_venv/
+__pycache__/
+*.pyc
+.env
+data/*.faiss
+data/*.pkl
+data/*.sqlite*
+*.mp4
+.claude/
